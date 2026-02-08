@@ -1,0 +1,34 @@
+{
+  "name": "devlens",
+  "version": "0.1.0",
+  "description": "MCP server that gives AI coding agents visual feedback on frontend apps",
+  "main": "dist/index.js",
+  "bin": {
+    "devlens": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amoghmanral/DevLens.git"
+  },
+  "keywords": ["mcp", "ai", "frontend", "screenshots", "devtools", "claude", "cursor"],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/amoghmanral/DevLens/issues"
+  },
+  "homepage": "https://github.com/amoghmanral/DevLens#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "puppeteer": "^24.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "typescript": "^5.7.3"
+  }
+}
