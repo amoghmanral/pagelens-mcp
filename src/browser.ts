@@ -117,6 +117,38 @@ export class BrowserManager {
     return errors;
   }
 
+  /** Relaunches the browser with the opposite headless setting, preserving the current URL. */
+  async toggleHeadless(): Promise<boolean> {
+    // Remember where we are
+    const currentUrl = this.connected && this.page ? this.page.url() : null;
+
+    // Close old browser
+    if (this.browser) {
+      await this.browser.close();
+    }
+
+    // Flip the setting and relaunch
+    this.headless = !this.headless;
+    this.browser = await puppeteer.launch({
+      headless: this.headless,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    this.page = await this.browser.newPage();
+    await this.page.setViewport(VIEWPORT_PRESETS[this.viewport]);
+    this.attachListeners(this.page);
+
+    // Navigate back to where we were
+    if (currentUrl) {
+      await this.page.goto(currentUrl, { waitUntil: "networkidle2", timeout: 30000 });
+      this.connected = true;
+    } else {
+      this.connected = false;
+    }
+
+    return this.headless;
+  }
+
   getBaseline(route: string): Buffer | undefined {
     return this.baselines.get(route);
   }

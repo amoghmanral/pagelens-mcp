@@ -245,5 +245,23 @@ export function createServer(browser: BrowserManager): McpServer {
     }
   );
 
+  // --- toggle_headless ---
+  server.tool(
+    "toggle_headless",
+    "Toggles between headless and visible browser mode. When visible, a Chrome window appears so you can watch the agent interact with the page. Call again to hide it.",
+    {},
+    async () => {
+      try {
+        const headless = await browser.toggleHeadless();
+        const mode = headless ? "headless (hidden)" : "visible (Chrome window open)";
+        return {
+          content: [{ type: "text", text: `Browser is now ${mode}.` }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
   return server;
 }
