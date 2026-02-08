@@ -3,6 +3,8 @@ import { z } from "zod";
 import { type BrowserManager } from "./browser.js";
 import { screenshot, screenshotElement } from "./tools/screenshot.js";
 import { consoleLogs, networkErrors } from "./tools/console.js";
+import { click, type as typeText, navigate, setViewport } from "./tools/interact.js";
+import { domInspect } from "./tools/inspect.js";
 
 export function createServer(browser: BrowserManager): McpServer {
   const server = new McpServer({
@@ -88,6 +90,108 @@ export function createServer(browser: BrowserManager): McpServer {
         )
         .join("\n");
       return { content: [{ type: "text", text }] };
+    }
+  );
+
+  // --- click ---
+  server.tool(
+    "click",
+    "Clicks an element by CSS selector and returns a screenshot of the result.",
+    {
+      selector: z.string().describe("CSS selector of the element to click"),
+    },
+    async (args) => {
+      try {
+        const base64 = await click(browser, args);
+        return {
+          content: [{ type: "image", data: base64, mimeType: "image/png" }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- type ---
+  server.tool(
+    "type",
+    "Types text into an input field and returns a screenshot of the result.",
+    {
+      selector: z.string().describe("CSS selector of the input element"),
+      text: z.string().describe("Text to type into the element"),
+      clear: z.boolean().optional().describe("Clear the field before typing (default: false)"),
+    },
+    async (args) => {
+      try {
+        const base64 = await typeText(browser, args);
+        return {
+          content: [{ type: "image", data: base64, mimeType: "image/png" }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- navigate ---
+  server.tool(
+    "navigate",
+    "Navigates to a URL or path and returns a screenshot of the new page.",
+    {
+      url: z.string().describe("Full URL or path (e.g. '/dashboard') to navigate to"),
+    },
+    async (args) => {
+      try {
+        const base64 = await navigate(browser, args);
+        return {
+          content: [{ type: "image", data: base64, mimeType: "image/png" }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- set_viewport ---
+  server.tool(
+    "set_viewport",
+    "Changes the browser viewport size and returns a screenshot at the new size.",
+    {
+      preset: z
+        .enum(["mobile", "tablet", "desktop"])
+        .optional()
+        .describe("Viewport preset: mobile (375x812), tablet (768x1024), desktop (1280x720)"),
+      width: z.number().optional().describe("Custom viewport width in pixels"),
+      height: z.number().optional().describe("Custom viewport height in pixels"),
+    },
+    async (args) => {
+      try {
+        const base64 = await setViewport(browser, args);
+        return {
+          content: [{ type: "image", data: base64, mimeType: "image/png" }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- dom_inspect ---
+  server.tool(
+    "dom_inspect",
+    "Gets the DOM structure and computed CSS for an element.",
+    {
+      selector: z.string().describe("CSS selector of the element to inspect"),
+    },
+    async (args) => {
+      try {
+        const result = await domInspect(browser, args);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
     }
   );
 
