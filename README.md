@@ -73,14 +73,16 @@ npm run dev
 
 ### 2. Add PageLens to your MCP config
 
+> **Note:** PageLens isn't on npm yet. See the [Development](#development) section to install from source, then use the config below with the local path.
+
 **Claude Code** (`.mcp.json` in project root):
 
 ```json
 {
   "mcpServers": {
     "pagelens": {
-      "command": "npx",
-      "args": ["pagelens", "http://localhost:5173"]
+      "command": "node",
+      "args": ["/path/to/PageLens/dist/index.js", "http://localhost:5173"]
     }
   }
 }
@@ -92,8 +94,8 @@ npm run dev
 {
   "mcpServers": {
     "pagelens": {
-      "command": "npx",
-      "args": ["pagelens", "http://localhost:5173"]
+      "command": "node",
+      "args": ["/path/to/PageLens/dist/index.js", "http://localhost:5173"]
     }
   }
 }
