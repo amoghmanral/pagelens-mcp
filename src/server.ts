@@ -1,10 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { type BrowserManager } from "./browser.js";
-import { screenshot, screenshotElement } from "./tools/screenshot.js";
+import { screenshot, screenshotElement, multiRouteScreenshot } from "./tools/screenshot.js";
 import { consoleLogs, networkErrors } from "./tools/console.js";
 import { click, type as typeText, navigate, setViewport } from "./tools/interact.js";
 import { domInspect } from "./tools/inspect.js";
+import { visualDiff } from "./tools/diff.js";
 
 export function createServer(browser: BrowserManager): McpServer {
   const server = new McpServer({
@@ -189,6 +190,55 @@ export function createServer(browser: BrowserManager): McpServer {
         return {
           content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- visual_diff ---
+  server.tool(
+    "visual_diff",
+    "Compares the current page to a previous baseline screenshot. On first call for a route, captures the baseline. On subsequent calls, returns a diff image highlighting changed pixels and a percentage of change.",
+    {
+      route: z.string().optional().describe("Navigate to this path first (e.g. '/dashboard'). Baselines are stored per route."),
+    },
+    async (args) => {
+      try {
+        const result = await visualDiff(browser, args);
+        if (result.isBaseline) {
+          return {
+            content: [{ type: "text", text: "Baseline captured for this route. Call visual_diff again after making changes to see the diff." }],
+          };
+        }
+        return {
+          content: [
+            { type: "text", text: `${result.percentChanged}% changed (${result.pixelsDifferent} of ${result.totalPixels} pixels differ)` },
+            { type: "image", data: result.diffBase64!, mimeType: "image/png" },
+          ],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- multi_route_screenshot ---
+  server.tool(
+    "multi_route_screenshot",
+    "Screenshots multiple routes in one call. Useful for checking the entire app after a CSS or layout change.",
+    {
+      routes: z.array(z.string()).describe("Array of paths to screenshot (e.g. ['/', '/about', '/dashboard'])"),
+    },
+    async (args) => {
+      try {
+        const results = await multiRouteScreenshot(browser, args);
+        const content: ({ type: "text"; text: string } | { type: "image"; data: string; mimeType: "image/png" })[] = [];
+        for (const r of results) {
+          content.push({ type: "text", text: `Route: ${r.route}` });
+          content.push({ type: "image", data: r.base64, mimeType: "image/png" });
+        }
+        return { content };
       } catch (err: any) {
         return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
       }

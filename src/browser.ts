@@ -25,6 +25,7 @@ export class BrowserManager {
 
   private consoleLogs: ConsoleEntry[] = [];
   private networkErrors: NetworkError[] = [];
+  private baselines: Map<string, Buffer> = new Map();
 
   constructor(targetUrl: string, options: { headless?: boolean; viewport?: ViewportPreset } = {}) {
     this.targetUrl = targetUrl;
@@ -104,6 +105,14 @@ export class BrowserManager {
     const errors = this.networkErrors;
     this.networkErrors = [];
     return errors;
+  }
+
+  getBaseline(route: string): Buffer | undefined {
+    return this.baselines.get(route);
+  }
+
+  setBaseline(route: string, png: Buffer): void {
+    this.baselines.set(route, png);
   }
 
   async close(): Promise<void> {
