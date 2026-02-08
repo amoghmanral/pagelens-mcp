@@ -7,10 +7,10 @@ import type { ViewportPreset } from "./utils/viewport-presets.js";
 
 function printUsage(): void {
   console.error(`
-DevLens — MCP server that gives AI agents eyes on your frontend app
+PageLens — MCP server that gives AI agents eyes on your frontend app
 
 Usage:
-  devlens <url> [options]
+  pagelens <url> [options]
 
 Arguments:
   url                  The URL of your running dev server (e.g. http://localhost:3000)
@@ -21,9 +21,9 @@ Options:
   -h, --help           Show this help message
 
 Examples:
-  devlens http://localhost:3000
-  devlens http://localhost:5173 --no-headless
-  devlens http://localhost:3000 --viewport mobile
+  pagelens http://localhost:3000
+  pagelens http://localhost:5173 --no-headless
+  pagelens http://localhost:3000 --viewport mobile
 `);
 }
 
@@ -76,7 +76,7 @@ function parseArgs(argv: string[]): {
 async function main(): Promise<void> {
   const { url, headless, viewport } = parseArgs(process.argv);
 
-  console.error(`DevLens starting...`);
+  console.error(`PageLens starting...`);
   console.error(`  Target URL: ${url}`);
   console.error(`  Headless:   ${headless}`);
   console.error(`  Viewport:   ${viewport}`);
@@ -85,7 +85,7 @@ async function main(): Promise<void> {
 
   // Graceful shutdown
   const cleanup = async () => {
-    console.error("DevLens shutting down...");
+    console.error("PageLens shutting down...");
     await browser.close();
     process.exit(0);
   };
@@ -101,7 +101,7 @@ async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error("DevLens MCP server running on stdio. Waiting for tool calls...");
+  console.error("PageLens MCP server running on stdio. Waiting for tool calls...");
 }
 
 main().catch((err) => {

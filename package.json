@@ -1,10 +1,10 @@
 {
-  "name": "devlens",
+  "name": "pagelens",
   "version": "0.1.0",
   "description": "MCP server that gives AI coding agents visual feedback on frontend apps",
   "main": "dist/index.js",
   "bin": {
-    "devlens": "dist/index.js"
+    "pagelens": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",

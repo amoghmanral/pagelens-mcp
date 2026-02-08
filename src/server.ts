@@ -9,7 +9,7 @@ import { visualDiff } from "./tools/diff.js";
 
 export function createServer(browser: BrowserManager): McpServer {
   const server = new McpServer({
-    name: "devlens",
+    name: "pagelens",
     version: "0.1.0",
   });
 

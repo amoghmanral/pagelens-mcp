@@ -1,13 +1,13 @@
 <div align="center">
 
-<img src="./assets/devlens-logo.png" alt="DevLens Logo" width="200" />
+<img src="./assets/pagelens-logo.png" alt="PageLens Logo" width="200" />
 
-# DevLens
+# PageLens
 
 <p>
-<a href="https://www.npmjs.com/package/devlens"><img src="https://img.shields.io/npm/v/devlens.svg" alt="npm version" /></a>
+<a href="https://www.npmjs.com/package/pagelens"><img src="https://img.shields.io/npm/v/pagelens.svg" alt="npm version" /></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
-<a href="https://www.npmjs.com/package/devlens"><img src="https://img.shields.io/npm/dm/devlens.svg" alt="npm downloads" /></a>
+<a href="https://www.npmjs.com/package/pagelens"><img src="https://img.shields.io/npm/dm/pagelens.svg" alt="npm downloads" /></a>
 <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6.svg" alt="TypeScript" />
 <img src="https://img.shields.io/badge/MCP-Compatible-green.svg" alt="MCP Compatible" />
 </p>
@@ -17,7 +17,7 @@ MCP server that gives AI coding agents visual feedback on frontend apps. One com
 </div>
 
 ```
-npx devlens http://localhost:3000
+npx pagelens http://localhost:3000
 ```
 
 ## The Problem
@@ -30,7 +30,7 @@ When using AI coding agents (Claude Code, Cursor, Windsurf) for frontend develop
 4. You copy console errors manually
 5. Repeat dozens of times per session
 
-DevLens eliminates this loop entirely.
+PageLens eliminates this loop entirely.
 
 ## How It Works
 
@@ -39,20 +39,20 @@ Your app (localhost:3000)
         |
 Headless Chrome (Puppeteer)
         |
-DevLens MCP Server
+PageLens MCP Server
         |
 Claude Code / Cursor / Windsurf
 ```
 
-DevLens launches a headless browser pointed at your dev server, collects console logs and network errors passively, and exposes tools that any MCP-compatible AI agent can call — screenshots, clicking, typing, DOM inspection, visual diffing — without you doing anything manually.
+PageLens launches a headless browser pointed at your dev server, collects console logs and network errors passively, and exposes tools that any MCP-compatible AI agent can call — screenshots, clicking, typing, DOM inspection, visual diffing — without you doing anything manually.
 
-## Why DevLens over Playwright MCP / Browser MCP?
+## Why PageLens over Playwright MCP / Browser MCP?
 
-General-purpose browser automation MCPs expose low-level primitives — you get `evaluate JavaScript`, `take screenshot`, `click element` as separate, disconnected actions. DevLens is purpose-built for the AI frontend development loop, which changes the design in ways that matter:
+General-purpose browser automation MCPs expose low-level primitives — you get `evaluate JavaScript`, `take screenshot`, `click element` as separate, disconnected actions. PageLens is purpose-built for the AI frontend development loop, which changes the design in ways that matter:
 
-| | DevLens | General browser MCPs |
+| | PageLens | General browser MCPs |
 |---|---|---|
-| **Setup** | `npx devlens <url>` — zero config | Requires browser launch management, connection handling |
+| **Setup** | `npx pagelens <url>` — zero config | Requires browser launch management, connection handling |
 | **Console/network errors** | Collected passively in the background. Agent checks whenever it wants. | Agent must actively poll or set up listeners. Errors between tool calls are lost. |
 | **Interaction feedback** | Every `click`, `type`, `navigate` automatically returns a screenshot | Agent must remember to take a screenshot after each action |
 | **Visual regression** | Built-in `visual_diff` — baseline capture, pixel comparison, diff image, change percentage | Not available. Agent would need to screenshot, store, compare manually. |
@@ -60,7 +60,7 @@ General-purpose browser automation MCPs expose low-level primitives — you get 
 | **Live debugging** | `toggle_headless` to pop open Chrome and watch the agent work in real time | Typically headless-only or requires restart |
 | **Multi-route audit** | `multi_route_screenshot` captures multiple pages in one call | Agent must navigate and screenshot each route individually |
 
-DevLens doesn't try to be a general browser automation framework. It does one thing — give your AI coding agent eyes on your frontend — and removes every manual step from that loop.
+PageLens doesn't try to be a general browser automation framework. It does one thing — give your AI coding agent eyes on your frontend — and removes every manual step from that loop.
 
 ## Quick Start
 
@@ -71,16 +71,16 @@ npm run dev
 # App running at http://localhost:5173
 ```
 
-### 2. Add DevLens to your MCP config
+### 2. Add PageLens to your MCP config
 
 **Claude Code** (`.mcp.json` in project root):
 
 ```json
 {
   "mcpServers": {
-    "devlens": {
+    "pagelens": {
       "command": "npx",
-      "args": ["devlens", "http://localhost:5173"]
+      "args": ["pagelens", "http://localhost:5173"]
     }
   }
 }
@@ -91,9 +91,9 @@ npm run dev
 ```json
 {
   "mcpServers": {
-    "devlens": {
+    "pagelens": {
       "command": "npx",
-      "args": ["devlens", "http://localhost:5173"]
+      "args": ["pagelens", "http://localhost:5173"]
     }
   }
 }
@@ -101,7 +101,7 @@ npm run dev
 
 ### 3. Start your agent
 
-That's it. The agent now has access to all DevLens tools. Ask it to "take a screenshot of my app" or "check for console errors" and it just works.
+That's it. The agent now has access to all PageLens tools. Ask it to "take a screenshot of my app" or "check for console errors" and it just works.
 
 ## Tools
 
@@ -141,7 +141,7 @@ That's it. The agent now has access to all DevLens tools. Ask it to "take a scre
 ## CLI Options
 
 ```
-devlens <url> [options]
+pagelens <url> [options]
 
 Options:
   --no-headless        Show the browser window
@@ -168,7 +168,7 @@ src/
 
 Key design decisions:
 
-- **Lazy connection** — The MCP server starts immediately. Navigation to your app happens on the first tool call, so DevLens never crashes if your dev server isn't running yet.
+- **Lazy connection** — The MCP server starts immediately. Navigation to your app happens on the first tool call, so PageLens never crashes if your dev server isn't running yet.
 - **Passive collection** — Console logs and network errors are captured in ring buffers from the moment the browser launches. The agent checks when it wants to, not when events happen.
 - **Screenshots after every interaction** — `click`, `type`, `navigate`, and `set_viewport` all return a screenshot so the agent always sees the result of what it did.
 - **Baseline storage** — Visual diff baselines are stored in memory per route. No filesystem setup needed.
@@ -176,8 +176,8 @@ Key design decisions:
 ## Development
 
 ```bash
-git clone https://github.com/amoghmanral/DevLens.git
-cd DevLens
+git clone https://github.com/amoghmanral/PageLens.git
+cd PageLens
 npm install
 npm run build
 ```
@@ -185,7 +185,7 @@ npm run build
 To test locally with Claude Code:
 
 ```bash
-claude mcp add devlens -- node /path/to/DevLens/dist/index.js http://localhost:3000
+claude mcp add pagelens -- node /path/to/PageLens/dist/index.js http://localhost:3000
 ```
 
 ## Tech Stack
