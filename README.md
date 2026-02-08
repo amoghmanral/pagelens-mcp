@@ -1,6 +1,10 @@
+<div align="center">
+
+<img src="./assets/devlens-logo.png" alt="DevLens Logo" width="200" />
+
 # DevLens
 
-<p align="center">
+<p>
 <a href="https://www.npmjs.com/package/devlens"><img src="https://img.shields.io/npm/v/devlens.svg" alt="npm version" /></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
 <a href="https://www.npmjs.com/package/devlens"><img src="https://img.shields.io/npm/dm/devlens.svg" alt="npm downloads" /></a>
@@ -9,6 +13,8 @@
 </p>
 
 MCP server that gives AI coding agents visual feedback on frontend apps. One command, no config — your AI agent can now see your app, click buttons, read console errors, and diff visual changes.
+
+</div>
 
 ```
 npx devlens http://localhost:3000
@@ -39,6 +45,22 @@ Claude Code / Cursor / Windsurf
 ```
 
 DevLens launches a headless browser pointed at your dev server, collects console logs and network errors passively, and exposes tools that any MCP-compatible AI agent can call — screenshots, clicking, typing, DOM inspection, visual diffing — without you doing anything manually.
+
+## Why DevLens over Playwright MCP / Browser MCP?
+
+General-purpose browser automation MCPs expose low-level primitives — you get `evaluate JavaScript`, `take screenshot`, `click element` as separate, disconnected actions. DevLens is purpose-built for the AI frontend development loop, which changes the design in ways that matter:
+
+| | DevLens | General browser MCPs |
+|---|---|---|
+| **Setup** | `npx devlens <url>` — zero config | Requires browser launch management, connection handling |
+| **Console/network errors** | Collected passively in the background. Agent checks whenever it wants. | Agent must actively poll or set up listeners. Errors between tool calls are lost. |
+| **Interaction feedback** | Every `click`, `type`, `navigate` automatically returns a screenshot | Agent must remember to take a screenshot after each action |
+| **Visual regression** | Built-in `visual_diff` — baseline capture, pixel comparison, diff image, change percentage | Not available. Agent would need to screenshot, store, compare manually. |
+| **Visual quality review** | `visual_audit` returns a structured checklist that prompts the agent to critically evaluate layout, contrast, content accuracy | No equivalent. Agents tend to superficially confirm "looks good" without guidance. |
+| **Live debugging** | `toggle_headless` to pop open Chrome and watch the agent work in real time | Typically headless-only or requires restart |
+| **Multi-route audit** | `multi_route_screenshot` captures multiple pages in one call | Agent must navigate and screenshot each route individually |
+
+DevLens doesn't try to be a general browser automation framework. It does one thing — give your AI coding agent eyes on your frontend — and removes every manual step from that loop.
 
 ## Quick Start
 
