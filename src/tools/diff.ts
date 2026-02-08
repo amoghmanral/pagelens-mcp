@@ -14,7 +14,7 @@ async function takeScreenshotBuffer(
   browser: BrowserManager,
   route?: string
 ): Promise<Buffer> {
-  const page = browser.getPage();
+  const page = await browser.getPage();
 
   if (route) {
     const url = new URL(route, page.url());

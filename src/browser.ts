@@ -22,6 +22,7 @@ export class BrowserManager {
   private targetUrl: string;
   private headless: boolean;
   private viewport: ViewportPreset;
+  private connected = false;
 
   private consoleLogs: ConsoleEntry[] = [];
   private networkErrors: NetworkError[] = [];
@@ -42,8 +43,16 @@ export class BrowserManager {
     this.page = await this.browser.newPage();
     await this.page.setViewport(VIEWPORT_PRESETS[this.viewport]);
     this.attachListeners(this.page);
+  }
 
-    await this.page.goto(this.targetUrl, { waitUntil: "networkidle2", timeout: 30000 });
+  /** Navigates to the target URL on first call. Subsequent calls are no-ops. */
+  private async ensureConnected(): Promise<void> {
+    if (this.connected) return;
+    const page = this.page;
+    if (!page) throw new Error("Browser not launched. Call launch() first.");
+
+    await page.goto(this.targetUrl, { waitUntil: "networkidle2", timeout: 30000 });
+    this.connected = true;
   }
 
   private attachListeners(page: Page): void {
@@ -83,10 +92,11 @@ export class BrowserManager {
     });
   }
 
-  getPage(): Page {
+  async getPage(): Promise<Page> {
     if (!this.page) {
       throw new Error("Browser not launched. Call launch() first.");
     }
+    await this.ensureConnected();
     return this.page;
   }
 

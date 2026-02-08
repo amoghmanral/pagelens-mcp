@@ -4,7 +4,7 @@ export async function screenshot(
   browser: BrowserManager,
   args: { route?: string; fullPage?: boolean }
 ): Promise<string> {
-  const page = browser.getPage();
+  const page = await browser.getPage();
 
   if (args.route) {
     const url = new URL(args.route, page.url());
@@ -23,7 +23,7 @@ export async function screenshotElement(
   browser: BrowserManager,
   args: { selector: string }
 ): Promise<string> {
-  const page = browser.getPage();
+  const page = await browser.getPage();
 
   const element = await page.$(args.selector);
   if (!element) {
@@ -43,7 +43,7 @@ export async function multiRouteScreenshot(
   browser: BrowserManager,
   args: { routes: string[] }
 ): Promise<RouteScreenshot[]> {
-  const page = browser.getPage();
+  const page = await browser.getPage();
   const results: RouteScreenshot[] = [];
 
   for (const route of args.routes) {

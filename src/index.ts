@@ -92,9 +92,11 @@ async function main(): Promise<void> {
   process.on("SIGINT", cleanup);
   process.on("SIGTERM", cleanup);
 
+  // Launch browser (but don't navigate yet — that happens lazily on first tool call)
   await browser.launch();
-  console.error("Browser launched and page loaded.");
+  console.error("Browser launched. Will connect to target URL on first tool call.");
 
+  // Start MCP server immediately so the agent can connect
   const server = createServer(browser);
   const transport = new StdioServerTransport();
   await server.connect(transport);

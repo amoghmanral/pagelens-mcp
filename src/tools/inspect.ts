@@ -34,7 +34,7 @@ export async function domInspect(
   browser: BrowserManager,
   args: { selector: string }
 ): Promise<DomInspectResult> {
-  const page = browser.getPage();
+  const page = await browser.getPage();
 
   const handle = await page.waitForSelector(args.selector, { timeout: 5000 });
   if (!handle) {
