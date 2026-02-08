@@ -82,3 +82,32 @@ export async function domInspect(
 
   return result;
 }
+
+export interface PageInfo {
+  url: string;
+  title: string;
+  viewport: { width: number; height: number };
+  scrollPosition: { x: number; y: number };
+  documentSize: { width: number; height: number };
+}
+
+export async function getPageInfo(browser: BrowserManager): Promise<PageInfo> {
+  const page = await browser.getPage();
+
+  const viewport = page.viewport();
+
+  const { scrollX, scrollY, docWidth, docHeight } = await page.evaluate(() => ({
+    scrollX: window.scrollX,
+    scrollY: window.scrollY,
+    docWidth: document.documentElement.scrollWidth,
+    docHeight: document.documentElement.scrollHeight,
+  }));
+
+  return {
+    url: page.url(),
+    title: await page.title(),
+    viewport: { width: viewport?.width ?? 0, height: viewport?.height ?? 0 },
+    scrollPosition: { x: Math.round(scrollX), y: Math.round(scrollY) },
+    documentSize: { width: docWidth, height: docHeight },
+  };
+}

@@ -68,3 +68,60 @@ export async function setViewport(
 
   return takeScreenshot(browser);
 }
+
+export async function scroll(
+  browser: BrowserManager,
+  args: { direction?: "up" | "down"; pixels?: number; selector?: string }
+): Promise<string> {
+  const page = await browser.getPage();
+  const distance = args.pixels ?? 500;
+  const sign = args.direction === "up" ? -1 : 1;
+
+  if (args.selector) {
+    await page.waitForSelector(args.selector, { timeout: 5000 });
+    await page.evaluate(
+      (sel: string, d: number) => {
+        const el = document.querySelector(sel);
+        if (el) el.scrollBy({ top: d, behavior: "smooth" });
+      },
+      args.selector,
+      distance * sign
+    );
+  } else {
+    await page.evaluate((d: number) => {
+      window.scrollBy({ top: d, behavior: "smooth" });
+    }, distance * sign);
+  }
+
+  // Wait for scroll to settle
+  await new Promise((r) => setTimeout(r, 300));
+
+  return takeScreenshot(browser);
+}
+
+export async function hover(
+  browser: BrowserManager,
+  args: { selector: string }
+): Promise<string> {
+  const page = await browser.getPage();
+
+  await page.waitForSelector(args.selector, { timeout: 5000 });
+  await page.hover(args.selector);
+
+  // Brief pause for hover effects / tooltips to appear
+  await new Promise((r) => setTimeout(r, 200));
+
+  return takeScreenshot(browser);
+}
+
+export async function select(
+  browser: BrowserManager,
+  args: { selector: string; value: string }
+): Promise<string> {
+  const page = await browser.getPage();
+
+  await page.waitForSelector(args.selector, { timeout: 5000 });
+  await page.select(args.selector, args.value);
+
+  return takeScreenshot(browser);
+}

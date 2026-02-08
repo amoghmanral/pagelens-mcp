@@ -3,8 +3,8 @@ import { z } from "zod";
 import { type BrowserManager } from "./browser.js";
 import { screenshot, screenshotElement, multiRouteScreenshot } from "./tools/screenshot.js";
 import { consoleLogs, networkErrors } from "./tools/console.js";
-import { click, type as typeText, navigate, setViewport } from "./tools/interact.js";
-import { domInspect } from "./tools/inspect.js";
+import { click, type as typeText, navigate, setViewport, scroll, hover, select } from "./tools/interact.js";
+import { domInspect, getPageInfo } from "./tools/inspect.js";
 import { visualDiff } from "./tools/diff.js";
 
 export function createServer(browser: BrowserManager): McpServer {
@@ -275,6 +275,83 @@ export function createServer(browser: BrowserManager): McpServer {
             },
             { type: "image", data: base64, mimeType: "image/png" },
           ],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- scroll ---
+  server.tool(
+    "scroll",
+    "Scrolls the page or a specific element and returns a screenshot. Defaults to scrolling down 500px.",
+    {
+      direction: z.enum(["up", "down"]).optional().describe("Scroll direction (default: down)"),
+      pixels: z.number().optional().describe("Number of pixels to scroll (default: 500)"),
+      selector: z.string().optional().describe("CSS selector of a scrollable element. Omit to scroll the page."),
+    },
+    async (args) => {
+      try {
+        const base64 = await scroll(browser, args);
+        return {
+          content: [{ type: "image", data: base64, mimeType: "image/png" }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- hover ---
+  server.tool(
+    "hover",
+    "Hovers over an element by CSS selector and returns a screenshot. Useful for triggering tooltips, dropdowns, and hover styles.",
+    {
+      selector: z.string().describe("CSS selector of the element to hover over"),
+    },
+    async (args) => {
+      try {
+        const base64 = await hover(browser, args);
+        return {
+          content: [{ type: "image", data: base64, mimeType: "image/png" }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- select ---
+  server.tool(
+    "select",
+    "Selects an option from a <select> dropdown by value and returns a screenshot.",
+    {
+      selector: z.string().describe("CSS selector of the <select> element"),
+      value: z.string().describe("The value attribute of the <option> to select"),
+    },
+    async (args) => {
+      try {
+        const base64 = await select(browser, args);
+        return {
+          content: [{ type: "image", data: base64, mimeType: "image/png" }],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
+  // --- get_page_info ---
+  server.tool(
+    "get_page_info",
+    "Returns the current page URL, title, viewport size, scroll position, and document dimensions.",
+    {},
+    async () => {
+      try {
+        const info = await getPageInfo(browser);
+        return {
+          content: [{ type: "text", text: JSON.stringify(info, null, 2) }],
         };
       } catch (err: any) {
         return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };

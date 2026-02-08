@@ -123,9 +123,13 @@ That's it. The agent now has access to all PageLens tools. Ask it to "take a scr
 |------|-------------|
 | `click` | Click an element by selector. Returns screenshot after click. |
 | `type` | Type text into an input field. Optional `clear` to replace existing content. Returns screenshot. |
+| `scroll` | Scroll the page or a specific element up/down by a given number of pixels. Returns screenshot. |
+| `hover` | Hover over an element by selector to trigger tooltips, dropdowns, or hover styles. Returns screenshot. |
+| `select` | Select an option from a `<select>` dropdown by value. Returns screenshot. |
 | `navigate` | Go to a URL or path. Returns screenshot of the new page. |
 | `set_viewport` | Resize to a preset (`mobile` 375x812, `tablet` 768x1024, `desktop` 1280x720) or custom `width`/`height`. Returns screenshot. |
 | `dom_inspect` | Get computed styles, classes, children, and bounding box for an element. |
+| `get_page_info` | Returns the current URL, page title, viewport size, scroll position, and document dimensions. |
 
 ### Diffing
 
