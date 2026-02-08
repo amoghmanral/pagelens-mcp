@@ -245,6 +245,43 @@ export function createServer(browser: BrowserManager): McpServer {
     }
   );
 
+  // --- visual_audit ---
+  server.tool(
+    "visual_audit",
+    "Takes a screenshot and prompts you to do a thorough visual review. Use this instead of screenshot when you need to critically assess visual quality, not just confirm something renders.",
+    {
+      route: z.string().optional().describe("Navigate to this path first (e.g. '/dashboard')"),
+      fullPage: z.boolean().optional().describe("Capture entire scrollable page instead of just viewport"),
+    },
+    async (args) => {
+      try {
+        const base64 = await screenshot(browser, args);
+        return {
+          content: [
+            {
+              type: "text",
+              text: [
+                "Visual audit — carefully evaluate each of the following:",
+                "",
+                "1. CONTENT ACCURACY: Does the rendered content look correct and realistic? Are images, icons, maps, charts, or data visualizations accurate — not just present?",
+                "2. LAYOUT & SPACING: Proper alignment, consistent spacing, no overlapping elements, nothing cut off or overflowing?",
+                "3. TYPOGRAPHY: Readable text, proper hierarchy, no orphaned words, appropriate font sizes?",
+                "4. COLOR & CONTRAST: Sufficient contrast for readability, consistent color scheme, no clashing colors?",
+                "5. VISUAL POLISH: Does it look production-ready? Any rough edges, placeholder content, or unfinished elements?",
+                "6. RESPONSIVE FIT: Does content fit the viewport naturally? Nothing awkwardly stretched or compressed?",
+                "",
+                "Report any issues you find with specific details about what looks wrong and where.",
+              ].join("\n"),
+            },
+            { type: "image", data: base64, mimeType: "image/png" },
+          ],
+        };
+      } catch (err: any) {
+        return { content: [{ type: "text", text: `Error: ${err.message}` }], isError: true };
+      }
+    }
+  );
+
   // --- toggle_headless ---
   server.tool(
     "toggle_headless",
