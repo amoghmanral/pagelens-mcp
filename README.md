@@ -182,8 +182,8 @@ Key design decisions:
 ## Development
 
 ```bash
-git clone https://github.com/amoghmanral/PageLens.git
-cd PageLens
+git clone https://github.com/amoghmanral/pagelens.git
+cd pagelens
 npm install
 npm run build
 ```
